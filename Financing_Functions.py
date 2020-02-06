@@ -1,39 +1,7 @@
 import os
+import re
 import pandas as pd
 import matplotlib.pyplot as plt
-
-keywords=[
-        'REWE',
-        'Techniker Krankenkasse',
-        'AMAZON',
-        'Telefonica',
-        'RVV-TICKETAUTOMAT',
-        'MCDONALD',
-        'Burger King',
-        'Bitpanda',
-        'YORMAS',
-        'EDEKA',
-        'Auszahlung',
-        'MOUNTAIN WAREHOUSE',
-        'Netto',
-        'SHELL',
-        'DBVERTRIEBG',
-        'DM-Drogerie',
-        'Feneberg',
-        'Patreon',
-        'AU Consulting GmbH',
-        'TOOM',
-        'ALDI',
-        'Lidl',
-        'PENNY',
-        'COMUTO',
-        'FRISTO',
-        'SPOTIFY',
-        'Apotheke',
-        'STEAM GAMES',
-        'HSK MENSA',
-        'M(ü|ue|u)ller'
-        ]
 
 categories_dict={
                 'SUPER':    ['REWE','YORMAS','FRISTO','EDEKA','Netto','PENNY','DM(-Drogerie|)','M(ü|ue|u)ller','Rossmann','Feneberg','real GmbH','Lidl', 'ALDI', 'Apotheke', 'Kunkel OHG'],
@@ -73,39 +41,56 @@ def get_data(name,workspace=r'C:\Users\chris\Documents\Unimportant\\', from_orig
                          dayfirst=True, infer_datetime_format=True, parse_dates=['Book_Date', 'Pay_Date'])
     else: df = pd.read_pickle(pklpath)
     df=df.fillna(value=0)
-    df.loc[:,'Category']='Uncategorized'
-    df['Keyword']=''
+    #df.loc[:,'Category']='Uncategorized'
+    #df['Keyword']=''
     df=df.drop(columns=['Pay_Date', 'Auftraggeberkonto', 'BLZ_Auftraggeberkonto', 'IBAN Auftraggeberkonto'])
     print('DONE')
     return df
 
-def parse_descriptions(dataframe, categories_dict):
-    print('Parsing Descriptions...')
-    df = dataframe
-    keywords = [ i for n in categories_dict.keys() for i in categories_dict[n] ]
-    for key in keywords:
-        df.loc[df.loc[:,'Description'].str.contains(key, case=False, flags=1), 'Description'] = key.replace('\\','')
-    print('DONE')
-    return df
+#def parse_descriptions(dataframe, categories_dict):
+#    print('Parsing Descriptions...')
+#    df = dataframe
+#    keywords = [ i for n in categories_dict.keys() for i in categories_dict[n] ]
+#    for key in keywords:
+#        df.loc[df.loc[:,'Description'].str.contains(key, case=False, flags=1), 'Description'] = key.replace('\\','')
+#    print('DONE')
+#    return df
         
-def parse_categories(dataframe, categories_dict):
+def find_category(desc,dic):
+    for cat, patterns in dic.items():
+        for pattern in patterns:
+            match = re.search(pattern, desc, re.IGNORECASE)
+            if match:
+                return cat, match.group()
+    return  'Undefined','Unknown'
+
+def parse_categories(dataframe,cats):
     print('Parsing Categories...')
     df=dataframe
-    for group in categories_dict.keys():
-        df.loc[df.loc[:,'Description'].str.contains('|'.join(categories_dict[group]), case=False, flags=1), 'Category'] = group
-
-        #df.loc[df['Description'].isin(categories_dict[group]), 'Category'] = group
+    found_categories=df['Description'].apply(find_category, args=[cats])
+    df['Category'], df['Ind']= zip(*found_categories)
     print('DONE')
     return df
 
+#def parse_categories0(dataframe, categories_dict):
+#    print('Parsing Categories...')
+#    df=dataframe
+#    for group in categories_dict.keys():
+#        df.loc[df.loc[:,'Description'].str.contains('|'.join(categories_dict[group]), case=False, flags=1), 'Category'] = group
+
+#        #df.loc[df['Description'].isin(categories_dict[group]), 'Category'] = group
+#    print('DONE')
+#    return df
+
 def plot_pie(dataframe, group_by='Category', colormap='hsv'):
-    print('Plotting Data...')
+    print('Plotting Data Pie...')
     df=dataframe
     ax = plt.gca()
     # pie chart with expenses separated by categories
-    df_group_sum=dataframe.groupby(by=group_by).sum()
-    df_expenses_cat=df_group_sum.abs().drop('INCOME')
-    df_expenses_cat.plot.pie(y='Amount', cmap=colormap, labels=df_group_sum.index, ax=ax, title='Expenses by Category')
+    df_group_sum=df.groupby(by=group_by).sum()
+    df_expenses_cat=df_group_sum.loc[df_group_sum.loc[:,'Amount']<=0,:].abs()#.drop('INCOME')
+    explode=[0.05 for i in df_expenses_cat.index.tolist()]
+    df_expenses_cat.plot.pie(y='Amount', explode=explode, cmap=colormap, labels=df_expenses_cat.index, ax=ax, title='Expenses by '+group_by, autopct='%1.0f%%')
 
     # Bar chart with daily expenses and incomes
     #df_daily=pd.DataFrame(columns=['INCOME','EXPENSES'])
@@ -116,15 +101,16 @@ def plot_pie(dataframe, group_by='Category', colormap='hsv'):
 
 
         
-    plt.title("expenses")
+    #plt.title("expenses")
     plt.legend(loc='upper right')
     plt.show()
     print('DONE')
     return df_daily_income, df_daily_expenses
        
-
-df2=parse_descriptions(get_data('umsatze'), categories_dict)
-df=parse_categories(df2, categories_dict)
-daily_in, daily_out=plot_pie(df, colormap='tab20')
-
-tmp=df.loc[df.loc[:,'Category']=='Uncategorized',['Description','Amount']]
+def get_dates(dataframe, from_=None, until_=None):
+    print('Getting Dates...\nfrom: %s, to %s' % from_, until_)
+    df=dataframe
+    if from_ is not None: df=df.loc[df.loc[:,'Book_Date']>=from_,:]
+    if until_ is not None: df=df.loc[df.loc[:,'Book_Date']<=until_,:]
+    print('DONE')
+    return df
