@@ -11,10 +11,11 @@ categories_dict={
                 'FUN':      ['BLIZZARD','LYNEX', 'Curiosityst', 'EUROBILL', 'Galeria','Bitpanda', 'LOVOO', 'STEAM GAMES', 'Fellhornbahn', 'GOOGLE', 'MINECRAFT'],
                 'CLOTHING': ['MOUNTAIN WAREHOUSE','H\+M','TK MAXX', 'NEW YORKER', 'Bijou Brigitte', 'Hopfer \+ Hopfer', 'Woolworth'],
                 'AMAZON':   ['AMAZON'],
-                'CASH':     ['Auszahlung', 'EINZAHLUNG'],
+                'CASH_OUT':     ['Auszahlung'],
+                'CASH_IN':['EINZAHLUNG'],
                 'GIFTS':    ['Xmas'],
-                'SAVINGS':  ['Savings'],
-                'INCOME':   ['Continental','Staatsoberkasse Bayern','Christian Knoblich','Zinsen', 'Muesli LOHN / GEHALT'],
+                'SAVINGS':  [],
+                'INCOME':   ['Savings','Continental','Staatsoberkasse Bayern','Christian Knoblich','Zinsen', 'Muesli LOHN / GEHALT'],
                 'OTHERS':   ['SHELL','AU Consulting GmbH','TOOM','KAMERA EXPRESS', 'Johanniter-Unfall-Hilfe e.V.', 'Action 3131', 'PURNATUR', 'UNICEF'],
                 'TRAVEL':   ['AirBnB', 'LUFTHAN(|SA)', 'Camping 3 Estrellas', 'AEROP ADOLFO SUAREZ M', 'taxi'],
                 'Amsterdam':['ALMERE','Nes Supermarket','HEXOBS','MOCO Museum','L.S. Domino','SHELTER','KIOSK WESTTunnel', 'AMSTERDAM', 'Tulip House', 'RA Tickets','ETOS', 'KEOLIS']
@@ -90,7 +91,7 @@ def plot_pie(dataframe, group_by='Category', colormap='hsv'):
     df_group_sum=df.groupby(by=group_by).sum()
     df_expenses_cat=df_group_sum.loc[df_group_sum.loc[:,'Amount']<=0,:].abs()#.drop('INCOME')
     explode=[0.05 for i in df_expenses_cat.index.tolist()]
-    df_expenses_cat.plot.pie(y='Amount', explode=explode, cmap=colormap, labels=df_expenses_cat.index, ax=ax, title='Expenses by '+group_by, autopct='%1.0f%%')
+    df_expenses_cat.plot.pie(y='Amount', table=df_expenses_cat, explode=explode, cmap=colormap, ax=ax, title='Expenses by '+group_by, autopct=make_autopct(df_expenses_cat.loc[:,'Amount']))# labels=df_expenses_cat.index,   '%2.1f%%'
 
     # Bar chart with daily expenses and incomes
     #df_daily=pd.DataFrame(columns=['INCOME','EXPENSES'])
@@ -107,10 +108,21 @@ def plot_pie(dataframe, group_by='Category', colormap='hsv'):
     print('DONE')
     return df_daily_income, df_daily_expenses
        
-def get_dates(dataframe, from_=None, until_=None):
-    print('Getting Dates...\nfrom: %s, to %s' % from_, until_)
+def get_dates(dataframe, from_='', until_=''):
+    print('Getting Dates...')
     df=dataframe
-    if from_ is not None: df=df.loc[df.loc[:,'Book_Date']>=from_,:]
-    if until_ is not None: df=df.loc[df.loc[:,'Book_Date']<=until_,:]
+    if from_ is not '': 
+        print('From: %s' % from_)
+        df=df.loc[df.loc[:,'Book_Date']>=from_,:]
+    if until_ is not '': 
+        print('Until: %s' % until_)
+        df=df.loc[df.loc[:,'Book_Date']<=until_,:]
     print('DONE')
     return df
+
+def make_autopct(values):
+    def my_autopct(pct):
+        total = sum(values)
+        val = int(round(pct*total/100.0))
+        return '{p:.2f}%  ({v:d})'.format(p=pct,v=val)
+    return my_autopct
