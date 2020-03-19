@@ -1,0 +1,38 @@
+
+categories_dict={
+                'SUPER':    ['REWE','YORMAS','FRISTO','EDEKA','Netto','PENNY','DM(-Drogerie|)','M(ü|ue|u)ller','Rossmann','Feneberg','real GmbH','Lidl', 'ALDI', 'Apotheke', 'Kunkel OHG'],
+                'FOOD':     ['GIANOLI','COFFEE FELLOWS', 'Mc( |)Donald','HOOTERS', 'HARVEYS', 'Burger K(ing)?', 'CHIPOTLE MEXICAN GRILL', 'HSK MENSA', 'TAKEAWAYCOM', 'WONDER WAFFEL', 'NORDSEE GmbH', 'Rooster Fried Chicken'],
+                'CONSTANT': ['Green Living Inn','Telefonica','Patreon','Techniker Krankenkasse','Miete','Spotify','Objektverwaltung Kempten GmbH KD 62D'],
+                'TRANSPORT':['COMUTO','DBVERTRIEB','FlixBus','RVV-TICKETAUTOMAT'],
+                'FUN':      ['MEDIMAX', 'BLIZZARD', 'Thomas Meyer', 'LYNEX', 'Curiosityst', 'EUROBILL', 'Galeria','Bitpanda', 'LOVOO', 'STEAM GAMES', 'Fellhornbahn', 'GOOGLE', 'MINECRAFT'],
+                'CLOTHING': ['Trend Star', 'MOUNTAIN WAREHOUSE','H\+M','TK MAXX', 'NEW YORKER', 'Bijou Brigitte', 'Hopfer \+ Hopfer', 'Woolworth','C\+A'],
+                'AMAZON':   ['AMAZON'],
+                'CASH_OUT':     ['Auszahlung'],
+                'CASH_IN':  ['EINZAHLUNG'],
+                'GIFTS':    ['Xmas'],
+                'SAVINGS':  [],
+                'INCOME':   ['Savings','Continental','Staatsoberkasse Bayern','Christian Knoblich','Zinsen', 'Muesli LOHN / GEHALT'],
+                'OTHERS':   ['SHELL','AU Consulting GmbH','TOOM','KAMERA EXPRESS', 'Johanniter-Unfall-Hilfe e.V.', 'Action 3131', 'PURNATUR', 'UNICEF'],
+                'TRAVEL':   ['AirBnB', 'OFFENBACHER', 'HANNIEULER', 'LUFTHAN(|SA)', 'Camping 3 Estrellas', 'AEROP ADOLFO SUAREZ M', 'taxi'],
+                'Amsterdam':['ALMERE','Nes Supermarket','HEXOBS','MOCO Museum','L.S. Domino','SHELTER','KIOSK WESTTunnel', 'AMSTERDAM', 'Tulip House', 'RA Tickets','ETOS', 'KEOLIS'],
+                'TEMPORARY':[],
+                }
+
+category_color={
+                'AMAZON':      'blue',
+                'Amsterdam':       'lightblue',
+                'CASH_IN':   'chocolate',
+                'CASH_OUT':  'orange',
+                'CLOTHING':        'green',
+                'CONSTANT':   'lightgreen',
+                'FOOD':     'red',
+                'FUN':   'salmon',
+                'GIFTS':    'purple',
+                'INCOME':      'orchid',
+                'OTHERS':    'grey',
+                'SAVINGS':     'silver',
+                'SUPER':     'indigo',
+                'TEMPORARY':     'maroon',
+                'TRANSPORT':  'teal',
+                'TRAVEL':  'aqua',
+                }

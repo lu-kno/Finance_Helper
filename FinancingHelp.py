@@ -1,15 +1,24 @@
 import os
 import pickle
-import pandas
+import pandas as pd
 from datetime import datetime, timedelta
 from Financing_Functions import *
+from categories import categories_dict
 
-filename= 'Umsaetze_feb2020'
 
-df=get_data(filename)
-#df=parse_descriptions(df, categories_dict)
-df=parse_categories(df, categories_dict)
-df=get_dates(df,from_='2019')
-daily_in, daily_out=plot_pie(df, colormap='tab20')
+files=[
+    'umsaetze2019Dec',
+    'umsaetze2020Feb',
+    'Umsaetze_feb2020',
+    ]
+filename= files[1]
+plot=0
 
+df0=get_data(parse=1)#'Umsaetze_KtoNr144701000_EUR_14-03-2020_1907'
+#df=parse_categories(df, categories_dict)
+df=get_dates(df0,from_='2019-12',until_='2020-04')
+#df.index=df['Book_Date']
+#dff=df.groupby(by=[df.index.month, df.index.year])
+plot_monthly_pies(df)
+if plot: plot_pie(df, colormap='tab20')
 #tmp=df.loc[df.loc[:,'Category']=='Uncategorized',['Description','Amount']]
