@@ -1,25 +1,33 @@
 import os
 import re
+import json
 import pandas as pd
 import matplotlib.pyplot as plt
 from categories import categories_dict, category_color
 
-
-#from plotly import __version__
-#import cufflinks as cf
-#from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot 
-#init_notebook_mode(connected=True)
+from config import * # containing the path where the files csv and pkl are saved
 
 
 pklName='UmsatzLog'
-workspace=r'C:\Users\chris\Documents\Unimportant\\'
 
-def get_data(*files,workspace=workspace, from_original=1, parse=0):
+
+def get_data(*files,workspace=workspace, file_path=file_path, from_original=1, parse=0):
     print('Getting Data...')
     pkl=0
     csv=0
     pklpath=workspace+pklName+'.pkl'
     
+
+    # all files from 'file_path' will be parsed, together with the ones from argument *files
+    available_files=os.listdir(file_path)
+    try:
+        with open(workspace+'parsed_files.json') as file: parsed_files=json.load(file)
+    except:
+        parsed_files=[]
+    to_parse=[p for p in available_files if p not in parsed_files]
+
+
+    files=list(files)+to_parse
     cols=['Book_Date',
             'Pay_Date',
             'Type',
@@ -40,7 +48,8 @@ def get_data(*files,workspace=workspace, from_original=1, parse=0):
 
     if len(files)>0:
         for file in files:
-            csvpath=workspace+file+'.CSV'
+            csvpath=workspace+file
+            if not file.endswith('.CSV'): csvpath=csvpath+'.CSV'
 
             csv=1
             df = pd.read_csv(csvpath, sep =';', header=0, names=cols, index_col=False, decimal=',',
@@ -48,6 +57,8 @@ def get_data(*files,workspace=workspace, from_original=1, parse=0):
         
             df=df.fillna(value=0)
             df=parse_categories(df,categories_dict)
+            df=df[df['Book_Date'].apply(type)!=type(0)]  # ignore if no Transaction date is given in the CSV
+            df['Book_Date']=df['Book_Date'].apply(lambda BD: BD.to_datetime64())
             df=get_hash(df)
             df=df.drop(columns=['Pay_Date', 'Auftraggeberkonto', 'BLZ_Auftraggeberkonto', 'IBAN_Auftraggeberkonto'])
     
@@ -57,6 +68,8 @@ def get_data(*files,workspace=workspace, from_original=1, parse=0):
             df=df[df['Book_Date']>=endDatePKL]
             df_merged=pd.merge(df,df_pkl,how='outer')
             df_pkl=df_merged
+        parsed_files=list(parsed_files)+list(to_parse)
+        with open(workspace+'parsed_files.json','w+') as file: json.dump(parsed_files,file)
 
     if parse: df_pkl=parse_categories(df_pkl,categories_dict)
     save_pkl(df_pkl)
@@ -72,18 +85,18 @@ def get_hash(dataframe):
     print('DONE')
     return df
 
-def find_category(desc,dic):
-    for cat, patterns in dic.items():
+def find_category(description,dictionary):
+    for cat, patterns in dictionary.items():
         for pattern in patterns:
-            match = re.search(pattern, desc, re.IGNORECASE)
+            match = re.search(pattern, description, re.IGNORECASE)
             if match:
                 return cat, match.group()
     return  'Undefined','Unknown'
 
-def parse_categories(dataframe,cats):
+def parse_categories(dataframe,category_dict):
     print('Parsing Categories...')
     df=dataframe
-    found_categories=df['Book_Text'].apply(find_category, args=[cats])
+    found_categories=df['Book_Text'].apply(find_category, args=[category_dict])
     df['Category'], df['Description']= zip(*found_categories)
     print('DONE')
     return df
