@@ -338,4 +338,8 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+# project specific
 /config.py
+*.pyproj
+*.sln
