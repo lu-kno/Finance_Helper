@@ -1,72 +1,24 @@
 import os
 import pickle
-import pandas
+import pandas as pd
 from datetime import datetime, timedelta
-from FunctionsClasses import *
-
-filename= 'umsatze.CSV'
-
+from Financing_Functions import *
+from categories import categories_dict
 
 
-CSV_FilePath='C:/Users/Christian/Documents/Unimportant/'+filename
-with open(CSV_FilePath, 'r') as file:
-    lines=file.readlines()
+files=[
+    'umsaetze2019Dec',
+    'umsaetze2020Feb',
+    'Umsaetze_feb2020',
+    ]
+filename= files[1]
+plot=0
 
-thing=[]
-first=True
-for line in lines:
-    if first: first=False
-    elif line=='\n' or line=='': pass
-    else: 
-        transaction=C_Transaction(line)
-        thing.append(transaction)
-
-end=datetime.now()
-start=end-timedelta(days=18)
-
-
-keywords=['REWE',
-            'Techniker Krankenkasse',
-            'AMAZON',
-            'Telefonica',
-            'RVV-TICKETAUTOMAT',
-            'MCDONALDS',
-            'Bitpanda',
-            'YORMAS',
-            'EDEKA',
-            'Auszahlung',
-            'MOUNTAIN WAREHOUSE',
-            'Netto',
-            'SHELL',
-            'DBVERTRIEBG',
-            'DM-Drogerie',
-            'Feneberg',
-            'Patreon',
-            'AU Consulting GmbH',
-            'TOOM'
-            ]
-
-super=['REWE',
-        'YORMAS',
-        'EDEKA',
-        'Netto',
-        'DM-Drogerie',
-        'Feneberg'
-        ]
-
-#for i in keywords:
-#    GetExpenses(thing, start, end, info=i)
-
-    
-#print('TOTAL KNOWN')
-#GetExpenses(thing, start, end, info=keywords)
-
-
-#print('TOTAL')
-#GetExpenses(thing, start, end, exinfo=keywords, name='others')
-
-GetExpensesByCategory(thing, start, datetime.now())
-
-
-
-#GetExpensesByInfo(thing, start, end)
+df0=get_data(parse=1)#'Umsaetze_KtoNr144701000_EUR_14-03-2020_1907'
+#df=parse_categories(df, categories_dict)
+df=get_dates(df0,from_='2019-12',until_='2020-04')
+#df.index=df['Book_Date']
+#dff=df.groupby(by=[df.index.month, df.index.year])
+plot_monthly_pies(df)
+if plot: plot_pie(df, colormap='tab20')
+#tmp=df.loc[df.loc[:,'Category']=='Uncategorized',['Description','Amount']]

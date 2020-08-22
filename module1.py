@@ -1,5 +1,8 @@
+import pandas as pd
 
-for i in range(10):
-    for j in range(5):
-        print(i,'----',j)
-        if j == 2: break
+#df1=pd.read_csv('test.csv',sep=';')
+#df2=pd.read_csv('test2.csv',sep=';')
+def foo():
+    global x
+    #x=1
+    return

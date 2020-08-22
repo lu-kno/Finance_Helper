@@ -31,6 +31,16 @@
     <Compile Include="Financing_Functions.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="categories.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="FinanceGUI.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="test.csv" />
+    <Content Include="test2.csv" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
